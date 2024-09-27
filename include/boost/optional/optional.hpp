@@ -59,6 +59,7 @@
 #include <boost/optional/detail/optional_factory_support.hpp>
 #include <boost/optional/detail/optional_aligned_storage.hpp>
 #include <boost/optional/detail/optional_hash.hpp>
+#include <boost/optional/detail/optional_storage.hpp>
 
 namespace boost { namespace optional_detail {
 
@@ -674,28 +675,28 @@ class optional
 
     // Creates an optional<T> uninitialized.
     // No-throw
-    optional() BOOST_NOEXCEPT : base() {}
+    constexpr optional() BOOST_NOEXCEPT : base() {}
 
     // Creates an optional<T> uninitialized.
     // No-throw
-    optional( none_t none_ ) BOOST_NOEXCEPT : base(none_) {}
+    constexpr optional( none_t none_ ) BOOST_NOEXCEPT : base(none_) {}
 
     // Creates an optional<T> initialized with 'val'.
     // Can throw if T::T(T const&) does
-    optional ( argument_type val ) : base(optional_detail::init_value_tag(), val) {}
+    constexpr optional ( argument_type val ) : base(optional_detail::init_value_tag(), val) {}
 
     // Creates an optional<T> initialized with 'move(val)'.
     // Can throw if T::T(T &&) does
-    optional ( rval_reference_type val ) : base(optional_detail::init_value_tag(), boost::forward<T>(val))
+    constexpr optional ( rval_reference_type val ) : base(optional_detail::init_value_tag(), boost::forward<T>(val))
       {}
 
     // Creates an optional<T> initialized with 'val' IFF cond is true, otherwise creates an uninitialized optional.
     // Can throw if T::T(T const&) does
-    optional ( bool cond, argument_type val ) : base(cond,val) {}
+    constexpr optional ( bool cond, argument_type val ) : base(cond,val) {}
 
     /// Creates an optional<T> initialized with 'val' IFF cond is true, otherwise creates an uninitialized optional.
     // Can throw if T::T(T &&) does
-    optional ( bool cond, rval_reference_type val ) : base( cond, boost::forward<T>(val) )
+    constexpr optional ( bool cond, rval_reference_type val ) : base( cond, boost::forward<T>(val) )
       {}
 
     // NOTE: MSVC needs templated versions first
@@ -906,27 +907,27 @@ class optional
     // Returns a reference to the value if this is initialized, otherwise,
     // the behaviour is UNDEFINED
     // No-throw
-    reference_const_type get() const { BOOST_ASSERT(this->is_initialized()) ; return this->get_impl(); }
-    reference_type       get()       { BOOST_ASSERT(this->is_initialized()) ; return this->get_impl(); }
+    constexpr reference_const_type get() const { BOOST_ASSERT(this->is_initialized()) ; return this->get_impl(); }
+    constexpr reference_type       get()       { BOOST_ASSERT(this->is_initialized()) ; return this->get_impl(); }
 
     // Returns a copy of the value if this is initialized, 'v' otherwise
-    reference_const_type get_value_or ( reference_const_type v ) const { return this->is_initialized() ? get() : v ; }
-    reference_type       get_value_or ( reference_type       v )       { return this->is_initialized() ? get() : v ; }
+    constexpr reference_const_type get_value_or ( reference_const_type v ) const { return this->is_initialized() ? get() : v ; }
+    constexpr reference_type       get_value_or ( reference_type       v )       { return this->is_initialized() ? get() : v ; }
 
     // Returns a pointer to the value if this is initialized, otherwise,
     // the behaviour is UNDEFINED
     // No-throw
-    pointer_const_type operator->() const { BOOST_ASSERT(this->is_initialized()) ; return this->get_ptr_impl() ; }
-    pointer_type       operator->()       { BOOST_ASSERT(this->is_initialized()) ; return this->get_ptr_impl() ; }
+    constexpr pointer_const_type operator->() const { BOOST_ASSERT(this->is_initialized()) ; return this->get_ptr_impl() ; }
+    constexpr pointer_type       operator->()       { BOOST_ASSERT(this->is_initialized()) ; return this->get_ptr_impl() ; }
 
     // Returns a reference to the value if this is initialized, otherwise,
     // the behaviour is UNDEFINED
     // No-throw
-    reference_const_type operator *() const& { return this->get() ; }
-    reference_type       operator *() &      { return this->get() ; }
-    reference_type_of_temporary_wrapper operator *() && { return boost::move(this->get()) ; }
+    constexpr reference_const_type operator *() const& { return this->get() ; }
+    constexpr reference_type       operator *() &      { return this->get() ; }
+    constexpr reference_type_of_temporary_wrapper operator *() && { return boost::move(this->get()) ; }
 
-    reference_const_type value() const&
+    constexpr reference_const_type value() const&
       {
         if (this->is_initialized())
           return this->get() ;
@@ -934,7 +935,7 @@ class optional
           throw_exception(bad_optional_access());
       }
 
-    reference_type value() &
+    constexpr reference_type value() &
       {
         if (this->is_initialized())
           return this->get() ;
@@ -942,7 +943,7 @@ class optional
           throw_exception(bad_optional_access());
       }
 
-    reference_type_of_temporary_wrapper value() &&
+    constexpr reference_type_of_temporary_wrapper value() &&
       {
         if (this->is_initialized())
           return boost::move(this->get()) ;
@@ -953,7 +954,7 @@ class optional
 
 
     template <class U>
-    value_type value_or ( U&& v ) const&
+    constexpr value_type value_or ( U&& v ) const&
       {
         if (this->is_initialized())
           return get();
@@ -962,7 +963,7 @@ class optional
       }
 
     template <class U>
-    value_type value_or ( U&& v ) &&
+    constexpr value_type value_or ( U&& v ) &&
       {
         if (this->is_initialized())
           return boost::move(get());
@@ -1046,9 +1047,9 @@ class optional
       }
 
 
-    bool has_value() const BOOST_NOEXCEPT { return this->is_initialized() ; }
+    constexpr bool has_value() const BOOST_NOEXCEPT { return this->is_initialized() ; }
 
-    explicit operator bool() const BOOST_NOEXCEPT { return this->has_value() ; }
+    constexpr explicit operator bool() const BOOST_NOEXCEPT { return this->has_value() ; }
 } ;
 
 
